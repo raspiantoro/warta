@@ -1,5 +1,7 @@
 package warta
 
+//go:generate mockery -name=listener
+
 import (
 	"reflect"
 )
