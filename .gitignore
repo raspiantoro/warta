@@ -15,4 +15,4 @@
 # vendor/
 
 # mock files
-mocks
+mock_*

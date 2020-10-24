@@ -1,6 +1,6 @@
 package warta
 
-//go:generate mockery -name=Warta
+//go:generate mockery -name=Warta -inpkg
 
 import (
 	"reflect"

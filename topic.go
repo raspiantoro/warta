@@ -1,6 +1,6 @@
 package warta
 
-//go:generate mockery -name=topic
+//go:generate mockery -name=topic -inpkg
 
 import (
 	"sync"
