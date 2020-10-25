@@ -7,7 +7,7 @@ import (
 )
 
 type listener interface {
-	Close() (err error)
+	Close()
 	Callback() interface{}
 }
 
@@ -32,7 +32,7 @@ func newListener(name string, topic topic, callback interface{}) (l listener, er
 	return
 }
 
-func (l *listen) Close() (err error) {
+func (l *listen) Close() {
 
 	mu := l.topic.getMutex()
 	mu.Lock()

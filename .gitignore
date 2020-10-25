@@ -16,3 +16,6 @@
 
 # mock files
 mock_*
+
+# examples
+examples/u_*
