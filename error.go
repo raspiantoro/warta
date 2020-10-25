@@ -20,4 +20,12 @@ var (
 	// ErrArgsIsFunc is returned by broadcast operation when  one of the
 	// given args is a function
 	ErrArgsIsFunc = errors.New("Cannot use func as arguments")
+
+	// ErrArgsLenNotMatch is returned by broadcast operation when the
+	// given total args not same with listener callback total args
+	ErrArgsLenNotMatch = errors.New("Arguments length not match")
+
+	// ErrArgsIsDifferent is returned by broadcast operation when one of the
+	// given args is different type with listener callback args
+	ErrArgsIsDifferent = errors.New("Call using different kind of arguments")
 )

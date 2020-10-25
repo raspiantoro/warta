@@ -1,7 +1,6 @@
 package warta
 
 import (
-	"errors"
 	"reflect"
 )
 
@@ -10,7 +9,7 @@ func compareAndAnalyze(listener interface{}, args []interface{}) error {
 	in := x.NumIn()
 
 	if in != len(args) {
-		return errors.New("Arguments length not match")
+		return ErrArgsLenNotMatch
 	}
 
 	for i := 0; i < in; i++ {
@@ -18,7 +17,7 @@ func compareAndAnalyze(listener interface{}, args []interface{}) error {
 		argsV := args[i]
 
 		if inV.Kind() != reflect.ValueOf(argsV).Kind() {
-			return errors.New("Call using different kind of arguments")
+			return ErrArgsIsDifferent
 		}
 	}
 

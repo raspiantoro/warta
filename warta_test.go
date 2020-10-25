@@ -6,7 +6,12 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	mock "github.com/stretchr/testify/mock"
 )
+
+func mockFnListener(s string) {
+	fmt.Println("hello")
+}
 
 func Test_New_ShouldReturnWarta(t *testing.T) {
 	expected := &warta{
@@ -28,13 +33,12 @@ func Test_CreateTopic_TopicAlreadyExists(t *testing.T) {
 		mu:     &sync.Mutex{},
 	}
 
-	var expcTopic topic = nil
-	expcErr := ErrTopicExists
+	expectedErr := ErrTopicExists
 
 	topic, err := warta.CreateTopic(name)
 
-	assert.Equal(t, expcTopic, topic)
-	assert.Equal(t, expcErr, err)
+	assert.Equal(t, nil, topic)
+	assert.Equal(t, expectedErr, err)
 }
 
 func Test_CreateTopic_TopicNotYetExists(t *testing.T) {
@@ -48,18 +52,17 @@ func Test_CreateTopic_TopicNotYetExists(t *testing.T) {
 
 	listeners := make(map[string]listener)
 
-	expcTopic := &_topic{
+	expectedTopic := &_topic{
 		listeners: listeners,
 		mu:        mu,
 	}
-	expcTopics := map[TopicName]topic{name: expcTopic}
-	var expcErr error = nil
+	expectedTopics := map[TopicName]topic{name: expectedTopic}
 
 	topic, err := warta.CreateTopic(name)
 
-	assert.Equal(t, expcTopic, topic)
-	assert.Equal(t, expcTopics, warta.topics)
-	assert.Equal(t, expcErr, err)
+	assert.Equal(t, expectedTopic, topic)
+	assert.Equal(t, expectedTopics, warta.topics)
+	assert.Equal(t, nil, err)
 }
 
 func Test_Broadcast_TopicNotExists(t *testing.T) {
@@ -71,45 +74,39 @@ func Test_Broadcast_TopicNotExists(t *testing.T) {
 		mu:     &sync.Mutex{},
 	}
 
-	expcErr := ErrTopicNotExists
+	expectedErr := ErrTopicNotExists
 
 	err := warta.Broadcast(name)
 
-	assert.Equal(t, expcErr, err)
-}
-
-func mockFnListener(s string) {
-	fmt.Println("hello")
+	assert.Equal(t, expectedErr, err)
 }
 
 func Test_Broadcast_TopicExists(t *testing.T) {
 	var name TopicName = "test-topic"
-	tp := &mockTopic{}
+	mTopic := &mockTopic{}
 
-	lsName := "4324345"
+	listenerID := "4324345"
 
-	fnls := mockFnListener
+	fn := mockFnListener
 
-	l := &listen{
-		name:     lsName,
-		topic:    tp,
-		callback: fnls,
+	listen := &listen{
+		id:       listenerID,
+		topic:    mTopic,
+		callback: fn,
 	}
 
-	tp.On("getListeners").Return(map[string]listener{lsName: l})
+	mTopic.On("getListeners").Return(map[string]listener{listenerID: listen})
 
-	topics := map[TopicName]topic{name: tp}
+	topics := map[TopicName]topic{name: mTopic}
 
 	warta := warta{
 		topics: topics,
 		mu:     &sync.Mutex{},
 	}
 
-	var expcErr error = nil
+	err := warta.Broadcast(name, "hello")
 
-	err := warta.Broadcast(name, "helo")
-
-	assert.Equal(t, expcErr, err)
+	assert.Equal(t, nil, err)
 }
 
 func Test_BroadcastCreate_TopicNotExists(t *testing.T) {
@@ -122,39 +119,234 @@ func Test_BroadcastCreate_TopicNotExists(t *testing.T) {
 		mu:     &sync.Mutex{},
 	}
 
-	var expcErr error = nil
+	err := warta.BroadcastCreate(name, "hello")
 
-	err := warta.BroadcastCreate(name, "helo")
-
-	assert.Equal(t, expcErr, err)
+	assert.Equal(t, nil, err)
 }
 
 func Test_BroadcastCreate_TopicExists(t *testing.T) {
 	var name TopicName = "test-topic"
-	tp := &mockTopic{}
+	mTopic := &mockTopic{}
 
-	lsName := "4324345"
+	listenerID := "4324345"
 
-	fnls := mockFnListener
+	fn := mockFnListener
 
-	l := &listen{
-		name:     lsName,
-		topic:    tp,
-		callback: fnls,
+	listen := &listen{
+		id:       listenerID,
+		topic:    mTopic,
+		callback: fn,
 	}
 
-	tp.On("getListeners").Return(map[string]listener{lsName: l})
+	mTopic.On("getListeners").Return(map[string]listener{listenerID: listen})
 
-	topics := map[TopicName]topic{name: tp}
+	topics := map[TopicName]topic{name: mTopic}
 
 	warta := warta{
 		topics: topics,
 		mu:     &sync.Mutex{},
 	}
 
-	var expcErr error = nil
+	var expectedErr error = nil
 
-	err := warta.BroadcastCreate(name, "helo")
+	err := warta.BroadcastCreate(name, "hello")
 
-	assert.Equal(t, expcErr, err)
+	assert.Equal(t, expectedErr, err)
+}
+
+func Test_BroadcastClose_TopicNotExists(t *testing.T) {
+	var name TopicName = "test-topic"
+
+	topics := map[TopicName]topic{}
+
+	warta := warta{
+		topics: topics,
+		mu:     &sync.Mutex{},
+	}
+
+	expectedErr := ErrTopicNotExists
+
+	err := warta.BroadcastClose(name, "hello")
+
+	assert.Equal(t, expectedErr, err)
+}
+
+func Test_BroadcastClose_TopicExists(t *testing.T) {
+	var name TopicName = "test-topic"
+	mTopic := &mockTopic{}
+
+	listenerID := "4324345"
+
+	fnls := mockFnListener
+
+	listen := &listen{
+		id:       listenerID,
+		topic:    mTopic,
+		callback: fnls,
+	}
+
+	mTopic.On("getListeners").Return(map[string]listener{listenerID: listen})
+
+	topics := map[TopicName]topic{name: mTopic}
+
+	warta := warta{
+		topics: topics,
+		mu:     &sync.Mutex{},
+	}
+
+	err := warta.BroadcastClose(name, "hello")
+
+	assert.Equal(t, nil, err)
+}
+
+func Test_Listen_TopicNotExists(t *testing.T) {
+	var name TopicName = "test-topic"
+
+	topics := map[TopicName]topic{}
+
+	fn := mockFnListener
+
+	warta := warta{
+		topics: topics,
+		mu:     &sync.Mutex{},
+	}
+
+	expectedErr := ErrTopicNotExists
+
+	listener, err := warta.Listen(name, fn)
+
+	assert.Equal(t, nil, listener)
+	assert.Equal(t, expectedErr, err)
+}
+
+func Test_Listen_TopicExists(t *testing.T) {
+	var name TopicName = "test-topic"
+
+	mTopic := &mockTopic{}
+
+	listenerID := "4324345"
+
+	fn := mockFnListener
+
+	expectedListener := &listen{
+		id:       listenerID,
+		topic:    mTopic,
+		callback: fn,
+	}
+
+	mTopic.On("addListener", mock.AnythingOfType("func(string)")).Return(expectedListener, nil)
+
+	topics := map[TopicName]topic{name: mTopic}
+
+	warta := warta{
+		topics: topics,
+		mu:     &sync.Mutex{},
+	}
+
+	listener, err := warta.Listen(name, fn)
+
+	assert.Equal(t, expectedListener, listener)
+	assert.Equal(t, nil, err)
+}
+
+func Test_ListenCreate_TopicExists(t *testing.T) {
+	var name TopicName = "test-topic"
+
+	mu := &sync.Mutex{}
+
+	listenerID := "4324345"
+
+	fn := mockFnListener
+
+	mTopic := &mockTopic{}
+
+	expectedListener := &listen{
+		callback: fn,
+		topic:    mTopic,
+		id:       listenerID,
+	}
+
+	mTopic.On("addListener", mock.AnythingOfType("func(string)")).Return(expectedListener, nil)
+
+	topics := map[TopicName]topic{name: mTopic}
+
+	warta := warta{
+		topics: topics,
+		mu:     mu,
+	}
+
+	listener, err := warta.ListenCreate(name, fn)
+
+	assert.Equal(t, expectedListener, listener)
+	assert.Equal(t, nil, err)
+}
+
+func Test_broadcast_ArgsIsFunction(t *testing.T) {
+	var name TopicName = "test-topic"
+
+	fn := mockFnListener
+
+	expectedErr := ErrArgsIsFunc
+
+	warta := &warta{}
+
+	err := warta.broadcast(name, fn)
+
+	assert.Equal(t, expectedErr, err)
+}
+
+func Test_broadcast_ArgsCountNotMatch(t *testing.T) {
+	var name TopicName = "test-topic"
+	mTopic := &mockTopic{}
+
+	listenerID := "4324345"
+
+	fn := mockFnListener
+
+	listen := &listen{
+		id:       listenerID,
+		topic:    mTopic,
+		callback: fn,
+	}
+
+	mTopic.On("getListeners").Return(map[string]listener{listenerID: listen})
+
+	topics := map[TopicName]topic{name: mTopic}
+
+	warta := warta{
+		topics: topics,
+		mu:     &sync.Mutex{},
+	}
+
+	err := warta.broadcast(name, "hello", "world")
+
+	assert.Equal(t, ErrArgsLenNotMatch, err)
+}
+
+func Test_broadcast_ArgsDifferentType(t *testing.T) {
+	var name TopicName = "test-topic"
+	mTopic := &mockTopic{}
+
+	listenerID := "4324345"
+
+	fn := mockFnListener
+
+	listen := &listen{
+		id:       listenerID,
+		topic:    mTopic,
+		callback: fn,
+	}
+
+	mTopic.On("getListeners").Return(map[string]listener{listenerID: listen})
+
+	topics := map[TopicName]topic{name: mTopic}
+
+	warta := warta{
+		topics: topics,
+		mu:     &sync.Mutex{},
+	}
+
+	err := warta.broadcast(name, 1)
+
+	assert.Equal(t, ErrArgsIsDifferent, err)
 }

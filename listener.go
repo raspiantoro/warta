@@ -1,6 +1,6 @@
 package warta
 
-//go:generate mockery -name=listener -inpkg
+//go:generate mockery -name=listener -inpkg -testonly
 
 import (
 	"reflect"
@@ -26,7 +26,10 @@ func newListener(topic topic, callback interface{}) (l listener, err error) {
 		return
 	}
 
-	id := uuid.Must(uuid.NewRandom())
+	id, err := uuid.NewRandom()
+	if err != nil {
+		return
+	}
 
 	l = &listen{
 		id:       id.String(),
@@ -51,8 +54,6 @@ func (l *listen) Close() {
 	for key, val := range oListeners {
 		nListener[key] = val
 	}
-
-	oListeners = nil
 
 	l.topic.setListeners(nListener)
 

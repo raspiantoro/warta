@@ -22,6 +22,6 @@ func main() {
 	}
 	defer l.Close()
 
-	warta.BroadcastCreate(helloTopic, "John", "Doe")
+	warta.BroadcastClose(helloTopic, "John", "Doe")
 
 }

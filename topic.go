@@ -1,11 +1,12 @@
 package warta
 
-//go:generate mockery -name=topic -inpkg
+//go:generate mockery -name=topic -inpkg -testonly
 
 import (
 	"sync"
 )
 
+// TopicName define new type for topic name
 type TopicName string
 
 type topic interface {

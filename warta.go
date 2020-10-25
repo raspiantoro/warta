@@ -1,16 +1,20 @@
 package warta
 
-//go:generate mockery -name=Warta -inpkg
+//go:generate mockery -name=Warta -inpkg -testonly
 
 import (
 	"reflect"
 	"sync"
 )
 
+// Warta contain contract signature that should be implemented by
+// it's implementor (e.g mocks)
 type Warta interface {
 	CreateTopic(name TopicName) (topic, error)
+	CloseTopic(name TopicName)
 	Broadcast(topic TopicName, args ...interface{}) error
 	BroadcastCreate(topic TopicName, args ...interface{}) error
+	BroadcastClose(topic TopicName, args ...interface{}) error
 	Listen(topic TopicName, callback interface{}) (listener, error)
 	ListenCreate(topic TopicName, callback interface{}) (listener, error)
 }
@@ -20,6 +24,7 @@ type warta struct {
 	mu     *sync.Mutex
 }
 
+// New create new warta instance
 func New() Warta {
 	return &warta{
 		topics: make(map[TopicName]topic),
@@ -42,6 +47,15 @@ func (w *warta) CreateTopic(name TopicName) (t topic, err error) {
 	return
 }
 
+func (w *warta) CloseTopic(name TopicName) {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+
+	delete(w.topics, name)
+
+	return
+}
+
 func (w *warta) Broadcast(topic TopicName, args ...interface{}) (err error) {
 	if _, exists := w.topics[topic]; !exists {
 		return ErrTopicNotExists
@@ -54,6 +68,21 @@ func (w *warta) Broadcast(topic TopicName, args ...interface{}) (err error) {
 func (w *warta) BroadcastCreate(topic TopicName, args ...interface{}) (err error) {
 	w.CreateTopic(topic)
 	err = w.broadcast(topic, args...)
+	return
+}
+
+func (w *warta) BroadcastClose(topic TopicName, args ...interface{}) (err error) {
+	if _, exists := w.topics[topic]; !exists {
+		return ErrTopicNotExists
+	}
+
+	err = w.broadcast(topic, args...)
+	if err != nil {
+		return
+	}
+
+	w.CloseTopic(topic)
+
 	return
 }
 
