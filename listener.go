@@ -4,27 +4,32 @@ package warta
 
 import (
 	"reflect"
+
+	"github.com/google/uuid"
 )
 
 type listener interface {
 	Close()
 	Callback() interface{}
+	getID() string
 }
 
 type listen struct {
-	name     string
+	id       string
 	topic    topic
 	callback interface{}
 }
 
-func newListener(name string, topic topic, callback interface{}) (l listener, err error) {
+func newListener(topic topic, callback interface{}) (l listener, err error) {
 	if reflect.ValueOf(callback).Kind() != reflect.Func {
 		err = ErrCallbackNotFunction
 		return
 	}
 
+	id := uuid.Must(uuid.NewRandom())
+
 	l = &listen{
-		name:     name,
+		id:       id.String(),
 		topic:    topic,
 		callback: callback,
 	}
@@ -41,7 +46,7 @@ func (l *listen) Close() {
 	nListener := make(map[string]listener)
 
 	oListeners := l.topic.getListeners()
-	delete(oListeners, l.name)
+	delete(oListeners, l.id)
 
 	for key, val := range oListeners {
 		nListener[key] = val
@@ -56,4 +61,8 @@ func (l *listen) Close() {
 
 func (l *listen) Callback() interface{} {
 	return l.callback
+}
+
+func (l *listen) getID() string {
+	return l.id
 }
