@@ -1,0 +1,114 @@
+
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Minimal theme | Minimal is a theme for GitHub Pages.</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="Minimal theme" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Minimal is a theme for GitHub Pages." />
+<meta property="og:description" content="Minimal is a theme for GitHub Pages." />
+<link rel="canonical" href="https://pages-themes.github.io/minimal/" />
+<meta property="og:url" content="https://pages-themes.github.io/minimal/" />
+<meta property="og:site_name" content="Minimal theme" />
+<meta name="google-site-verification" content="Z6lrZp3yaHws8F4giSUaoe2sck--ltBt-UBkYJ_9Nmk" />
+<script type="application/ld+json">
+{"@type":"WebSite","publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://pages-themes.github.io/minimal/assets/img/logo.png"}},"headline":"Minimal theme","url":"https://pages-themes.github.io/minimal/","description":"Minimal is a theme for GitHub Pages.","name":"Minimal theme","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="https://pages-themes.github.io/minimal/assets/css/style.css?v=25df166e45b4f6061b26a8793526573f4acc80d9">
+    <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1><a href="https://raspiantoro.github.io/warta/">Warta</a></h1>
+        
+
+        <p class="has-line-data" data-line-start="0" data-line-end="1"><img src="https://user-images.githubusercontent.com/11055157/98251386-3ab8f280-1fab-11eb-956f-23e6bdc71924.jpg" alt="logo"></p>
+        
+        <p class="view"><a href="https://github.com/raspiantoro/warta">View the Project on GitHub <small>raspiantoro/warta</small></a></p>
+                
+        <ul class="downloads">
+          <li><a href="#">Download <strong>ZIP File</strong></a></li>
+          <li><a href="#">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/raspiantoro/warta">View On <strong>GitHub</strong></a></li>
+        </ul>
+        
+
+
+      </header>
+      <section>
+
+        <p><a href="https://github.com/raspiantoro/warta/actions"><img src="https://github.com/raspiantoro/warta/workflows/tests/badge.svg" alt="Tests Status" /></a>
+            <a href="https://coveralls.io/github/raspiantoro/warta?branch=master"><img src="https://coveralls.io/repos/github/raspiantoro/warta/badge.svg?branch=master&amp;service=github" alt="Coverage Status" /></a>
+            <a href="https://goreportcard.com/report/github.com/raspiantoro/warta"><img src="https://goreportcard.com/badge/github.com/raspiantoro/warta" alt="Go Report Status" /></a>
+            <a href="https://sonarcloud.io/dashboard?id=raspiantoro_warta"><img src="https://sonarcloud.io/api/project_badges/measure?project=raspiantoro_warta&amp;metric=alert_status" alt="Quality Gate Status" /></a>   <br />
+            
+            <p>Warta is a Golang package for event broadcast/emitters.</p>
+            
+            <h2 id="installation">Installation</h2>
+            
+            <p>Use <code class="language-plaintext highlighter-rouge">go get</code> command.</p>
+            
+            <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>go get github.com/raspiantoro/warta</code></pre></div></div>
+            
+            <h2 id="usage">Usage</h2>
+            
+            <div class="language-golang highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+            
+    <span class="k">var</span> <span class="n">helloTopic</span> <span class="n">warta</span><span class="o">.</span><span class="n">TopicName</span> <span class="o">=</span> <span class="s">"hello"</span>
+        
+    <span class="n">helloFunc</span> <span class="o">:=</span> <span class="k">func</span><span class="p">(</span><span class="n">fName</span> <span class="kt">string</span><span class="p">,</span> <span class="n">lName</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">fmt</span><span class="o">.</span><span class="n">Printf</span><span class="p">(</span><span class="s">"Hello %s %s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">fName</span><span class="p">,</span> <span class="n">lName</span><span class="p">)</span>
+    <span class="p">}</span>
+        
+    <span class="n">warta</span> <span class="o">:=</span> <span class="n">warta</span><span class="o">.</span><span class="n">New</span><span class="p">()</span>
+
+    <span class="n">l</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">warta</span><span class="o">.</span><span class="n">ListenCreate</span><span class="p">(</span><span class="n">helloTopic</span><span class="p">,</span> <span class="n">helloFunc</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="nb">panic</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="k">defer</span> <span class="n">l</span><span class="o">.</span><span class="n">Close</span><span class="p">()</span>
+
+    <span class="n">warta</span><span class="o">.</span><span class="n">BroadcastClose</span><span class="p">(</span><span class="n">helloTopic</span><span class="p">,</span> <span class="s">"John"</span><span class="p">,</span> <span class="s">"Doe"</span><span class="p">)</span>
+
+<span class="p">}</span>
+</code></pre></div></div>
+            
+            <h2 id="contributors">Contributors</h2>
+            <ol>
+              <li><a href="https://github.com/raspiantoro">Mario Raspiantoro</a></li>
+              <li><a href="https://www.behance.net/ishaq192933b63">Ishaq Dwiputra (logo design)</a></li>
+            </ol>
+            
+            <h2 id="contributing">Contributing</h2>
+            <p>Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.</p>
+            
+            <p>Please make sure to update tests as appropriate.</p>
+            
+            <h2 id="license">License</h2>
+            <p><a href="https://choosealicense.com/licenses/mit/">MIT</a></p>
+
+            
+
+      </section>
+
+      <footer>
+        <a href="https://sonarcloud.io/dashboard?id=raspiantoro_warta"><img src="https://sonarcloud.io/images/project_badges/sonarcloud-white.svg" alt="SonarCloud" /></a></p>
+        
+        <p>Maintained by <a href="https://github.com/raspiantoro">Mario Raspiantoro</a></p>
+        
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="https://pages-themes.github.io/minimal/assets/js/scale.fix.js"></script>
+  </body>
+</html>
