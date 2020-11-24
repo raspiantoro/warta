@@ -16,6 +16,10 @@ func compareAndAnalyze(listener interface{}, args []interface{}) error {
 		inV := x.In(i)
 		argsV := args[i]
 
+		if inV.Kind() == reflect.Interface {
+			break
+		}
+
 		if inV.Kind() != reflect.ValueOf(argsV).Kind() {
 			return ErrArgsIsDifferent
 		}
